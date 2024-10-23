@@ -1,5 +1,5 @@
 from typing import TypedDict, Literal, List
-from botpy.types.rich_text import AuditType
+from ymbotpy.types.rich_text import AuditType
 
 # 1：普通文本 2：HTML 3：Markdown 4： json
 Format = Literal[1, 2, 3, 4]

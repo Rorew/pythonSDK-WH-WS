@@ -1,8 +1,6 @@
 import asyncio
-import traceback
 from types import TracebackType
-from typing import Any, Callable, Coroutine, Dict, List, Tuple, Optional, Union, Type
-from .connection import ConnectionSession
+from typing import Any, Coroutine, Dict, List, Tuple, Optional, Union, Type
 from . import logging
 from .api import BotAPI
 from .gateway import BotWebHook

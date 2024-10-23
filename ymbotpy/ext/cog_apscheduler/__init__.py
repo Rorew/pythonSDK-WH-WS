@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from botpy import logging
+from ymbotpy import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 

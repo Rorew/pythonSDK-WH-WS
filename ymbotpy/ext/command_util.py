@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
-from botpy.message import BaseMessage
+from ymbotpy.message import BaseMessage
 
 
 class Commands:

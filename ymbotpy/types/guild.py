@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import TypedDict, List
 
-from botpy.types.user import User
+from ymbotpy.types.user import User
 
 
 class GuildPayload(TypedDict):
