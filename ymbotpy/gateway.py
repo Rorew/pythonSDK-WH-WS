@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-import asyncio
-from .api import BotAPI
-from .message import C2CMessage, GroupMessage, Message, DirectMessage, MessageAudit
+import binascii
+import json
 from .connection import ConnectionState
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import Response
@@ -39,22 +38,20 @@ class BotWebHook:
 
         self.appid = appid
         self.secret = secret
+        self.seed_bytes = secret.encode()
         self.hook_route = hook_route
         self.bot_client = client
         self.system_log= system_log
         self.botapi = botapi
-        # self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
         self.loop = loop
 
         self.conn = ConnectionState(
                 self.dispatch,self.botapi
             )
 
-    def handle_validation(self,body: dict, bot_secret: str):
+    def handle_validation(self,body: dict):
 
-        seed_bytes = bot_secret.encode()
-
-        signing_key = ed25519.Ed25519PrivateKey.from_private_bytes(seed_bytes)
+        signing_key = ed25519.Ed25519PrivateKey.from_private_bytes(self.seed_bytes)
 
         validation_payload = body['d']
         msg = validation_payload['event_ts'] + validation_payload['plain_token']
@@ -66,6 +63,56 @@ class BotWebHook:
             "signature": signature_hex
         }
         return response
+    
+    def verify_signature(self, headers):
+        signature = headers.get("x-signature-ed25519")
+        if not signature:
+            return False,''
+        try:
+            sig = binascii.unhexlify(signature)
+        except (binascii.Error, TypeError):
+            return False,''
+        
+        if len(sig) != 64 or (sig[63] & 224) != 0:
+            return False,''
+        
+        return True,sig
+
+
+    def generate_keys(self):
+        seed = self.seed_bytes
+        while len(seed) < 32:
+            seed = (seed * 2)[:32]
+        private_key = ed25519.Ed25519PrivateKey.from_private_bytes(seed)
+        public_key = private_key.public_key()
+        
+        return public_key, private_key
+
+    def get_signature_body(self, headers,body):
+        timestamp = headers.get("x-signature-timestamp")
+        if not timestamp:
+            return False,''
+        
+        msg = timestamp.encode('utf-8') + body
+       
+        return True,msg
+
+
+    def handle_validation_webhook(self,headers,body: dict):
+        try:
+            success,sig = self.verify_signature(headers)
+            if not success:
+                return False
+            public_key, private_key = self.generate_keys()
+            success, msg = self.get_signature_body(headers,body)
+            if not success:
+                return False
+            
+            public_key.verify(sig, msg)
+
+            return True
+        except:
+            return False
 
     def dispatch(self, event, message,*args, **kwargs):
         '''
@@ -82,7 +129,8 @@ class BotWebHook:
             except KeyboardInterrupt:
                 return
         except AttributeError:
-            print(f"[botpy] 事件: {event} 未注册")
+            from ymbotpy import logger
+            logger.info(f"[botpy] 事件: {event} 未注册")
         
 
     async def init_fastapi(self):
@@ -95,24 +143,37 @@ class BotWebHook:
             response = await call_next(request)
             return response
         
-        @app.post(self.hook_route)
+        @app.api_route(self.hook_route, methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
         async def qbot_callback(request: Request):
+            
             if request.headers.get("x-bot-appid",'') != self.appid:
                 return Response(status_code=403)
             
             if request.headers.get("user-agent",'') != "QQBot-Callback":
                 return Response(status_code=403)
             
+            if 'x-signature-ed25519' not in request.headers:
+                return Response(status_code=403)
+            
+            if 'x-signature-timestamp' not in request.headers:
+                return Response(status_code=403)
+            
             try:
-                body = await request.json()
+                bytes_body = await request.body()
+                body = json.loads(bytes_body.decode('utf-8'))
             except Exception as e:
                 logger.warning(e)
-                raise HTTPException(status_code=400, detail="Invalid JSON format")
+                return
+            
             if self.system_log:
-                logger.info(body)
+                logger.warning(body)
 
-            if body.get("op") == 13:
-                return self.handle_validation(body,self.secret)
+            if body.get("op") == self.WH_CALLBACK_CHECK:
+                return self.handle_validation(body)
+            
+            if not self.handle_validation_webhook(request.headers,bytes_body):
+                logger.error(f"签名校验不通过: {request.headers}")
+                return Response(status_code=403)
             
             event = body.get("t").lower()
             self.conn.parsers[event](body)
