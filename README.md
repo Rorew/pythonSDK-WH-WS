@@ -17,7 +17,6 @@ ymbotpy
 ``` bash
 pip install ymbotpy
 ```
-### 在开发平台应配置的回调地址为：example.com/qbot/webhook，您可以通过以下方式来修改回调URL
 ``注意: 由于通信方式的变化, 不再需要在本地注册监听事件，只需要编写具体的事件代码即可，事件开关在平台控制``
 
 快速上手
@@ -40,7 +39,7 @@ pip install ymbotpy
     ```
 
     
-2.  自定义webhook的url
+2.  在开发平台应配置的回调地址为：example.com/qbot/webhook，您可以通过以下方式来修改回调URL自定义webhook的url
     ``` python
     client.run(appid=BOT_APPID,secret=BOT_SECRET,port=8080,system_log=True,hook_route='/your_url')
     ```
