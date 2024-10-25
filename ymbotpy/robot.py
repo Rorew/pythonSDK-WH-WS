@@ -4,7 +4,7 @@ import time
 import aiohttp
 
 from .logging import get_logger
-from botpy.types import robot
+from ymbotpy.types import robot
 
 _log = get_logger()
 
