@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ymbotpy",
-    version='1.0.0.dev',
+    version='1.1.0.dev',
     author="yiming",
     author_email="1790233968@qq.com",
     description="QQ robot webhook server using Python 3",
@@ -16,7 +16,7 @@ setup(
     install_requires=["aiohttp>=3.7.4,<4", 
                       "PyYAML", 
                       "APScheduler",
-                      "cryptography>=43.0.0",
+                      "cryptography>=40.0.0",
                       "fastapi>=0.115.0",
                       "multidict",
                       "uvicorn"],
