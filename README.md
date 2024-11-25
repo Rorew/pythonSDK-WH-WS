@@ -76,6 +76,6 @@ WebSocket 快速上手（更多用法请参考官方文档）
 有关此 SDK 更多用法，请查阅qq-botpy <https://github.com/tencent-connect/botpy>
 
 ### 欢迎访问镜芯科技
-1.  天狼星框架：[https://www.siriusbot.cn/](天狼星框架)
-2.  镜芯API：[https://api2.wer.plus/](镜芯API)
-3.  林枫云_站长首选云服务器：[https://www.dkdun.cn/](林枫云)
+1.  天狼星框架：<https://www.siriusbot.cn/>
+2.  镜芯API：<https://api2.wer.plus/>
+3.  林枫云_站长首选云服务器：<https://www.dkdun.cn/>
