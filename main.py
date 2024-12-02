@@ -8,7 +8,7 @@ Github: https://github.com/HG-ha
 import ymbotpy
 from ymbotpy.message import DirectMessage, Message, GroupMessage, C2CMessage
 
-class MyClient(ymbotpy.Client):
+class MyClient(ymbotpy.WebHookClient):
     async def on_at_message_create(self, message: Message):
         """频道内@"""
         await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
