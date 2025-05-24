@@ -1,7 +1,7 @@
 botpy
 =======
 
-**ymbotpy** 是基于 机器人开放平台API <https://bot.q.qq.com/wiki/develop/api/> 实现的机器人框架，目的提供一个易使用、开发效率高的开发框架，同时支持Webhook和WebSocket，非Tencent官方SDK，但用法完全相同。
+**botpy** 是基于 机器人开放平台API <https://bot.q.qq.com/wiki/develop/api/> 实现的机器人框架，目的提供一个易使用、开发效率高的开发框架，同时支持Webhook和WebSocket，非Tencent官方SDK，但用法完全相同。
 
 
 特性
